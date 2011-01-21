@@ -1,8 +1,8 @@
 
 properties {
 
-    $psakeScriptToDraw = (gi ".\psakeViz.ps1")
-    $outputDirectory = (gi ".\output\")
+    $psakeScriptToDraw = ".\psakeViz.ps1"
+    $outputDirectory = ".\output\"
 }
 
 task default -depends Instructions, Draw
@@ -59,7 +59,7 @@ task Draw {
         };
     }
     
-    $psakeScriptFileinfo = (New-Object -TypeName "System.IO.FileInfo" -ArgumentList $psakeScriptToDraw)
+    $psakeScriptFileinfo = (New-Object -TypeName "System.IO.FileInfo" -ArgumentList (gi $psakeScriptToDraw))
     
     "switch to " + $psakeScriptFileinfo.DirectoryName
     $originalLocation = get-location
@@ -68,7 +68,7 @@ task Draw {
     
     try {
     
-        & $psakeScriptToDraw
+        & (gi $psakeScriptToDraw)
     } finally {
         set-location $originalLocation
     }
@@ -101,8 +101,8 @@ digraph {`
     
     $outputFilename = $psakeScriptFileinfo.BaseName;
     
-    if (-not (test-path $outputDirectory)) {
-        $null = mkdir $outputDirectory
+    if (-not (test-path (resolve-path $outputDirectory))) {
+        $null = mkdir (resolve-path $outputDirectory)
     }
     
     $result | & 'C:\Program Files (x86)\Graphviz2.26.3\bin\dot.exe' -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
