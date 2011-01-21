@@ -78,10 +78,12 @@ task Draw {
 
     $result = "`
 digraph {`
-    graph [rankdir = ""LR""];"
+    graph [rank=""source"";rankdir = ""LR""];"
 
+    $ks = @($tasks.keys);
+    [Array]::reverse($ks);
 
-    foreach($name in $tasks.keys) {
+    foreach($name in $ks) {
         $task = $tasks[$name];
         
         $line = "`n    $name [ shape=""record"", label=<$name> ] ";
