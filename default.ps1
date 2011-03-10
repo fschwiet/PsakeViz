@@ -24,7 +24,20 @@ task Draw {
     
     $global:tasks = $tasks
     
+	$result = DrawTasks $tasks
+	$result
+    
+    $outputFilename = $psakeScriptFileinfo.BaseName;
+    
+    if (-not (test-path $outputDirectory)) {
+        $null = mkdir $outputDirectory
+    }
+    
+    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
+    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tpdf -o (join-path $outputDirectory "$outputFilename.pdf")
+}
 
+function DrawTasks {
     $result = "`
 digraph {`
     graph [rank=""source"";rankdir = ""LR""];"
@@ -47,16 +60,6 @@ digraph {`
     
     $result += "`n}`n"
     $result
-    
-    
-    $outputFilename = $psakeScriptFileinfo.BaseName;
-    
-    if (-not (test-path $outputDirectory)) {
-        $null = mkdir $outputDirectory
-    }
-    
-    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
-    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tpdf -o (join-path $outputDirectory "$outputFilename.pdf")
 }
 
 function LoadTasks([System.IO.FileInfo] $psakeScript) {
