@@ -13,4 +13,4 @@ if ($outputDirectory) {
     $properties.outputDirectory = $outputDirectory;
 }
 
-.\psake.ps1 .\psakeViz.ps1 -properties $properties
+.\psake.ps1 .\default.ps1 -properties $properties

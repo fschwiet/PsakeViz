@@ -2,7 +2,7 @@
 properties {
 
 	$sourceDirectory = "."
-    $psakeScriptToDraw = ".\psakeViz.ps1"
+    $psakeScriptToDraw = ".\default.ps1"
     $outputDirectory = ".\output\"
 }
 
