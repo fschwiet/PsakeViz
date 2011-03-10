@@ -1,6 +1,7 @@
 
 properties {
 
+	$sourceDirectory = "."
     $psakeScriptToDraw = ".\psakeViz.ps1"
     $outputDirectory = ".\output\"
 }
@@ -101,12 +102,10 @@ digraph {`
     
     $outputFilename = $psakeScriptFileinfo.BaseName;
     
-    if (-not (test-path (resolve-path $outputDirectory))) {
-        $null = mkdir (resolve-path $outputDirectory)
+    if (-not (test-path $outputDirectory)) {
+        $null = mkdir $outputDirectory
     }
     
-    $result | & 'C:\Program Files (x86)\Graphviz2.26.3\bin\dot.exe' -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
-    $result | & 'C:\Program Files (x86)\Graphviz2.26.3\bin\dot.exe' -Tpdf -o (join-path $outputDirectory "$outputFilename.pdf")
+    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
+    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tpdf -o (join-path $outputDirectory "$outputFilename.pdf")
 }
-
-
