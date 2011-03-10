@@ -18,6 +18,49 @@ task Instructions -precondition { $psakeScriptToDraw -eq ".\psakeViz.ps1" } {
 
 task Draw {
 
+    $psakeScriptFileinfo = (New-Object -TypeName "System.IO.FileInfo" -ArgumentList (gi $psakeScriptToDraw))
+
+    $tasks = LoadTasks $psakeScriptFileinfo
+    
+    $global:tasks = $tasks
+    
+
+    $result = "`
+digraph {`
+    graph [rank=""source"";rankdir = ""LR""];"
+
+    $ks = @($tasks.keys);
+    [Array]::reverse($ks);
+
+    foreach($name in $ks) {
+
+        $task = $tasks[$name];
+        
+        $line = "`n    $name [ shape=""record"", label=<$name> ] ";
+    
+        foreach($dependency in $task.depends) {
+            $line += " $name -> $dependency;"
+        }
+        
+        $result += $line
+    }
+    
+    $result += "`n}`n"
+    $result
+    
+    
+    $outputFilename = $psakeScriptFileinfo.BaseName;
+    
+    if (-not (test-path $outputDirectory)) {
+        $null = mkdir $outputDirectory
+    }
+    
+    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
+    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tpdf -o (join-path $outputDirectory "$outputFilename.pdf")
+}
+
+function LoadTasks([System.IO.FileInfo] $psakeScript) {
+
     $tasks = @{};
 
     function Properties {
@@ -60,52 +103,16 @@ task Draw {
         };
     }
     
-    $psakeScriptFileinfo = (New-Object -TypeName "System.IO.FileInfo" -ArgumentList (gi $psakeScriptToDraw))
-    
-    "switch to " + $psakeScriptFileinfo.DirectoryName
     $originalLocation = get-location
-    set-location $psakeScriptFileinfo.Directory
-    $global:t = $psakeScriptFileinfo
+    set-location $psakeScript.Directory
+    $global:t = $psakeScript
     
     try {
     
-        & (gi $psakeScriptToDraw)
+        & (gi $psakeScript)
     } finally {
         set-location $originalLocation
     }
     
-    $global:tasks = $tasks
-    
-
-    $result = "`
-digraph {`
-    graph [rank=""source"";rankdir = ""LR""];"
-
-    $ks = @($tasks.keys);
-    [Array]::reverse($ks);
-
-    foreach($name in $ks) {
-        $task = $tasks[$name];
-        
-        $line = "`n    $name [ shape=""record"", label=<$name> ] ";
-    
-        foreach($dependency in $task.depends) {
-            $line += " $name -> $dependency;"
-        }
-        
-        $result += $line
-    }
-    
-    $result += "`n}`n"
-    $result
-    
-    
-    $outputFilename = $psakeScriptFileinfo.BaseName;
-    
-    if (-not (test-path $outputDirectory)) {
-        $null = mkdir $outputDirectory
-    }
-    
-    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
-    $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tpdf -o (join-path $outputDirectory "$outputFilename.pdf")
+	$tasks
 }
