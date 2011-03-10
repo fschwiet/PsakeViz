@@ -18,6 +18,11 @@ task Instructions -precondition { $psakeScriptToDraw -eq ".\psakeViz.ps1" } {
 
 task Draw {
 
+    VisualizePSakeScript $sourceDirectory $psakeScriptToDraw $outputDirectory
+}
+
+function VisualizePSakeScript($sourceDirectory, $psakeScriptToDraw, $outputDirectory) {
+
     $psakeScriptFileinfo = (New-Object -TypeName "System.IO.FileInfo" -ArgumentList (gi $psakeScriptToDraw))
 
     $tasks = LoadTasks $psakeScriptFileinfo
@@ -108,7 +113,6 @@ function LoadTasks([System.IO.FileInfo] $psakeScript) {
     
     $originalLocation = get-location
     set-location $psakeScript.Directory
-    $global:t = $psakeScript
     
     try {
     
