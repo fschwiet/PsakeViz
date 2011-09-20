@@ -25,7 +25,7 @@ function VisualizePSakeScript($sourceDirectory, $psakeScriptToDraw, $outputDirec
 function DrawTasks {
     $result = "`
 digraph {`
-    graph [rank=""source"";rankdir = ""LR""];"
+    graph [rank=""source""; rankdir = ""LR""];"
 
     $ks = @($tasks.keys);
     [Array]::reverse($ks);
@@ -87,10 +87,12 @@ function LoadTasks([System.IO.FileInfo] $psakeScript) {
             [Parameter(Position=8,Mandatory=0)]
             [string]$description = $null
         )        
+		
+		$name = $name.Replace("-", "");
         
         $tasks[$name] = @{
-            name = $name;
-            depends = $depends;
+            name = $name
+            depends = $depends | % { $_.Replace("-", "") };
         };
     }
     
