@@ -37,14 +37,16 @@ function DrawTasks {
         
 		$nodes += $name;
 
-        foreach($dependency in $task.depends) {
+		$dependencies = @($task.depends)
+
+        foreach($dependency in $dependencies) {
 			$edges += @{ head = $name; tail = $dependency}
 		}
     }
 	
     $result = "`
 digraph {`
-    graph [rank=""source""; rankdir = ""LR""];"
+    graph [rank=""source""; rankdir = ""LR""; ordering=out];"
 
 	foreach($node in $nodes) {
 		$result += "`n    $node [ shape=""record"", label=<$node> ]"
