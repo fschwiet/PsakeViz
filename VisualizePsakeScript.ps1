@@ -10,7 +10,6 @@ function VisualizePSakeScript($sourceDirectory, $psakeScriptToDraw, $outputDirec
     $global:tasks = $tasks
     
 	$result = DrawTasks $tasks
-	$result
     
     $outputFilename = $psakeScriptFileinfo.BaseName;
     
@@ -20,12 +19,14 @@ function VisualizePSakeScript($sourceDirectory, $psakeScriptToDraw, $outputDirec
     
     $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tjpg -o (join-path $outputDirectory "$outputFilename.jpg")
     $result | & "$sourceDirectory\Graphviz2.26.3\dot.exe" -Tpdf -o (join-path $outputDirectory "$outputFilename.pdf")
+	
+	$result
 }
 
 function DrawTasks {
-    $result = "`
-digraph {`
-    graph [rank=""source""; rankdir = ""LR""];"
+
+	$nodes = @()
+	$edges = @()
 
     $ks = @($tasks.keys);
     [Array]::reverse($ks);
@@ -34,14 +35,24 @@ digraph {`
 
         $task = $tasks[$name];
         
-        $line = "`n    $name [ shape=""record"", label=<$name> ] ";
-    
+		$nodes += $name;
+
         foreach($dependency in $task.depends) {
-            $line += " $name -> $dependency;"
-        }
-        
-        $result += $line
+			$edges += @{ head = $name; tail = $dependency}
+		}
     }
+	
+    $result = "`
+digraph {`
+    graph [rank=""source""; rankdir = ""LR""];"
+
+	foreach($node in $nodes) {
+		$result += "`n    $node [ shape=""record"", label=<$node> ]"
+	}
+	
+	foreach($edge in $edges) {
+		$result += "`n    $($edge.head) -> $($edge.tail)"
+	}
     
     $result += "`n}`n"
     $result
