@@ -108,6 +108,9 @@ function LoadTasks([System.IO.FileInfo] $psakeScript) {
             depends = $depends | % { $_.Replace("-", "") };
         };
     }
+	
+	function FormatTaskName {
+	}
     
     $originalLocation = get-location
     set-location $psakeScript.Directory
