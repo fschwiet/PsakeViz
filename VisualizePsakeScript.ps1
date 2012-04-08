@@ -27,6 +27,7 @@ function DrawTasks {
 
 	$nodes = @()
 	$edges = @()
+	$invisibleEdges = @();
 
     $ks = @($tasks.keys);
     [Array]::reverse($ks);
@@ -42,6 +43,10 @@ function DrawTasks {
         foreach($dependency in $dependencies) {
 			$edges += @{ head = $name; tail = $dependency}
 		}
+		
+		for($i = 0; $i -lt ($dependencies.length - 1); $i++) {
+			$invisibleEdges += @{ head = $dependencies[$i]; tail = $dependencies[$i+1]}
+		}
     }
 	
     $result = "`
@@ -54,6 +59,10 @@ digraph {`
 	
 	foreach($edge in $edges) {
 		$result += "`n    $($edge.head) -> $($edge.tail)"
+	}
+	
+	foreach($edge in $invisibleEdges) {
+		$result += "`n    $($edge.head) -> $($edge.tail) [color=white]"
 	}
     
     $result += "`n}`n"
