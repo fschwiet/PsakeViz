@@ -45,7 +45,7 @@ function DrawTasks {
 		}
 		
 		for($i = 0; $i -lt ($dependencies.length - 1); $i++) {
-			$invisibleEdges += @{ head = $dependencies[$i]; tail = $dependencies[$i+1]}
+			#$invisibleEdges += @{ head = $dependencies[$i]; tail = $dependencies[$i+1]}
 		}
     }
 	
